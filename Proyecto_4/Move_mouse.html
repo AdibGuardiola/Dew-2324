@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contenedor Móvil con Bola Rebotante</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+
+      .container {
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        border: 1px solid #ccc;
+        overflow: hidden; /* Evitar que la pelota se salga del contenedor */
+      }
+
+      .ball {
+        width: 50px;
+        height: 50px;
+        background-color: red;
+        border-radius: 50%;
+        position: absolute;
+        top: 50%; /* Ajustar la posición inicial para que la pelota comience en el centro vertical del contenedor */
+        left: 50%; /* Ajustar la posición inicial para que la pelota comience en el centro horizontal del contenedor */
+        transform: translate(-50%, -50%);
+        border: 2px solid black; /* Agregar un borde a la pelota */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" id="container">
+      <div class="ball"></div>
+    </div>
+
+    <script>
+      let container = document.getElementById("container");
+      let ball = document.querySelector(".ball");
+      let isDragging = false;
+      let mouseX,
+        mouseY,
+        containerX,
+        containerY,
+        speedX = 2,
+        speedY = 2; // Velocidades ajustadas
+
+      container.addEventListener("mousedown", (e) => {
+        isDragging = true;
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        containerX = container.offsetLeft;
+        containerY = container.offsetTop;
+      });
+
+      document.addEventListener("mousemove", (e) => {
+        if (isDragging) {
+          let deltaX = e.clientX - mouseX;
+          let deltaY = e.clientY - mouseY;
+
+          containerX += deltaX;
+          containerY += deltaY;
+
+          // Evitar que el contenedor se salga del área visible del documento
+          containerX = Math.max(
+            0,
+            Math.min(window.innerWidth - container.clientWidth, containerX)
+          );
+          containerY = Math.max(
+            0,
+            Math.min(window.innerHeight - container.clientHeight, containerY)
+          );
+
+          container.style.left = containerX + "px";
+          container.style.top = containerY + "px";
+
+          // Actualizar velocidad basada en el movimiento del ratón
+          speedX = deltaX;
+          speedY = deltaY;
+
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+        }
+      });
+
+      document.addEventListener("mouseup", () => {
+        isDragging = false;
+      });
+
+      function moveBall() {
+        let x = ball.offsetLeft + speedX;
+        let y = ball.offsetTop + speedY;
+
+        // Rebotar cuando la bola toca los bordes del contenedor
+        if (x <= 0 || x >= container.clientWidth - ball.clientWidth) {
+          speedX *= -1;
+        }
+
+        if (y <= 0 || y >= container.clientHeight - ball.clientHeight) {
+          speedY *= -1;
+        }
+
+        // Ajustar los límites para que la pelota no se desplace demasiado hacia la derecha o hacia arriba
+        x = Math.max(0, Math.min(container.clientWidth - ball.clientWidth, x));
+        y = Math.max(
+          0,
+          Math.min(container.clientHeight - ball.clientHeight, y)
+        );
+
+        ball.style.left = x + "px";
+        ball.style.top = y + "px";
+
+        // Llamar a la función nuevamente para animar la bola
+        requestAnimationFrame(moveBall);
+      }
+
+      // Iniciar la animación de la bola
+      moveBall();
+    </script>
+  </body>
+</html>
