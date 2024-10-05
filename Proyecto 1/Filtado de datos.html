@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filtrar Personas por Propiedad con Parseo</title>
+</head>
+<body>
+
+    <h1>Filtrar Personas por Propiedad</h1>
+    
+    <!-- Selector de propiedad -->
+    <select id="propiedad">
+        <option value="nombre">Nombre</option>
+        <option value="edad">Edad</option>
+        <option value="profesion">Profesión</option>
+        <option value="coche">Coche</option>
+    </select>
+
+    <!-- Campo para introducir el valor que queremos buscar -->
+    <input type="text" id="valor" placeholder="Introduce un valor">
+
+    <!-- Botón para realizar la búsqueda -->
+    <button id="buscar">Buscar</button>
+
+    <!-- Donde se mostrarán los resultados -->
+    <div id="resultado"></div>
+
+    <script>
+        const personas = [
+            { nombre: "Juan", edad: 25, profesion: "Ingeniero", coche: "Toyota" },
+            { nombre: "Ana", edad: 30, profesion: "Doctora", coche: "Mercedes" },
+            { nombre: "Carlos", edad: 28, profesion: "Abogado", coche: "Ford" },
+            { nombre: "María", edad: 22, profesion: "Diseñadora", coche: "Mercedes" },
+            { nombre: "Pedro", edad: 35, profesion: "Profesor", coche: "Audi" },
+            { nombre: "Daniel", edad: 22, profesion: "Limpiador", coche: "Toyota" },
+        ];
+
+        // Función asincrónica para buscar personas según la propiedad y valor
+        async function buscarPersonas() {
+            const propiedad = document.getElementById("propiedad").value; // Obtener la propiedad seleccionada
+            let valor = document.getElementById("valor").value; // Obtener el valor introducido
+
+            const resultadoDiv = document.getElementById("resultado");
+            resultadoDiv.innerHTML = ""; // Limpiar resultados anteriores
+
+            // Parsear el valor si es necesario (solo para 'edad')
+            if (propiedad === "edad") {
+                valor = parseInt(valor); // Convertir el valor a número
+            } else {
+                valor = valor.toLowerCase(); // Para las demás propiedades, tratamos el valor como texto
+            }
+
+            // Filtrar personas que coincidan con la propiedad y el valor
+            const personasFiltradas = personas.filter(persona => {
+                // Comparamos dependiendo de si es número o texto
+                if (typeof persona[propiedad] === "number") {
+                    return persona[propiedad] === valor; // Comparación numérica para la edad
+                } else {
+                    return String(persona[propiedad]).toLowerCase() === valor; // Comparación de strings para el resto
+                }
+            });
+
+            if (personasFiltradas.length > 0) {
+                // Mostrar las personas que coinciden
+                personasFiltradas.forEach((persona, index) => {
+                    resultadoDiv.innerHTML += `
+                        <p><strong>Resultado ${index + 1}:</strong></p>
+                        <p>Nombre: ${persona.nombre}</p>
+                        <p>Edad: ${persona.edad}</p>
+                        <p>Profesión: ${persona.profesion}</p>
+                        <p>Marca de coche: ${persona.coche}</p>
+                        <hr>`;
+                });
+            } else {
+                resultadoDiv.innerHTML = "<p>No se encontraron resultados</p>";
+            }
+        }
+
+        // Evento del botón para realizar la búsqueda
+        document.getElementById("buscar").addEventListener("click", buscarPersonas);
+
+    </script>
+
+</body>
+</html>
